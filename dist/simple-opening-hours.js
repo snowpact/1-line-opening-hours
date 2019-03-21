@@ -1,4 +1,4 @@
-var SimpleOpeningHours = (function () {
+var SimpleOpeningHours = /** @class */ (function () {
     /**
      * Creates the OpeningHours Object with OSM opening_hours string
      */

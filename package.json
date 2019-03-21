@@ -1,6 +1,6 @@
 {
   "name": "simple-opening-hours",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Simple parser for OpenStreetMap opening_hours",
   "main": "dist/simple-opening-hours.js",
   "scripts": {

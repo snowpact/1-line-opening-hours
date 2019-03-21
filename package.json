@@ -1,10 +1,10 @@
 {
   "name": "simple-opening-hours",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Simple parser for OpenStreetMap opening_hours",
   "main": "dist/simple-opening-hours.js",
   "scripts": {
-    "prepare" : "npm run build",
+    "prepare": "npm run build",
     "build": "tsc",
     "start": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1"

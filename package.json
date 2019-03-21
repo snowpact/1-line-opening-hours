@@ -1,0 +1,30 @@
+{
+  "name": "simple-opening-hours",
+  "version": "0.0.1",
+  "description": "Simple parser for OpenStreetMap opening_hours",
+  "main": "dist/simple-opening-hours.js",
+  "scripts": {
+    "prepare" : "npm run build",
+    "build": "tsc",
+    "start": "tsc -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wbkd/simple-opening-hours.git"
+  },
+  "keywords": [
+    "opening_hours",
+    "osm",
+    "openstreetmap"
+  ],
+  "author": "webk1d",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wbkd/simple-opening-hours/issues"
+  },
+  "homepage": "https://github.com/wbkd/simple-opening-hours#readme",
+  "devDependencies": {
+    "typescript": "^3.3.4000"
+  }
+}

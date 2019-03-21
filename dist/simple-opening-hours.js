@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var SimpleOpeningHours = /** @class */ (function () {
     /**
      * Creates the OpeningHours Object with OSM opening_hours string
@@ -260,4 +262,5 @@ var SimpleOpeningHours = /** @class */ (function () {
     };
     return SimpleOpeningHours;
 }());
+exports.SimpleOpeningHours = SimpleOpeningHours;
 //# sourceMappingURL=simple-opening-hours.js.map

@@ -1,12 +1,14 @@
 {
 	"compilerOptions": {
-    	"module": "amd",
-		"target": "es3",
+        "target": "es5",
+        "module": "commonjs",
+        "declaration": true,
         "noImplicitAny": false,
         "removeComments": false,
         "preserveConstEnums": true,
-        "outFile": "dist/simple-opening-hours.js",
         "sourceMap": true,
-	},
-	"exclude": []
+        "outDir": "./dist"
+    },
+    "include": ["src"],
+    "exclude": ["node_modules", "**/__tests__/*"]
 }

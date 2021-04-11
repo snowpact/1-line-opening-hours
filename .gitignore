@@ -1,4 +1,4 @@
 node_modules/
-openingparser-tests._ts
-tasks.json
+.history
+
 *.log

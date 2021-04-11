@@ -1,14 +1,17 @@
 {
 	"compilerOptions": {
-        "target": "es5",
         "module": "commonjs",
+        "target": "es2015",
         "declaration": true,
+        "strict": true,
         "noImplicitAny": false,
-        "removeComments": false,
+        "removeComments": true,
         "preserveConstEnums": true,
         "sourceMap": true,
+        "esModuleInterop": true,
         "outDir": "./dist"
     },
-    "include": ["src"],
+    "include": ["src/**/*", "tests/**/*"],
     "exclude": ["node_modules", "**/__tests__/*"]
 }
+

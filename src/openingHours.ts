@@ -9,7 +9,7 @@ export interface OpeningHoursData {
   ph: string[];
 }
 
-export class SimpleOpeningHours {
+export class OpeningHours {
   private MAX_CLOSE_TIME = '24:00';
   private MIN_OPEN_TIME = '00:00';
 

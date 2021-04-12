@@ -1,7 +1,7 @@
-import { SimpleOpeningHours } from '../src/simpleOpeningHours';
+import { OpeningHours } from '../src/openingHours';
 
 test('toString() test', () => {
-  const openingHours = new SimpleOpeningHours('Mo-Sa 06:00-14:00');
+  const openingHours = new OpeningHours('Mo-Sa 06:00-14:00');
 
   const stringified = openingHours.toReadableString();
   expect(stringified).toEqual(

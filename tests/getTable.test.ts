@@ -1,7 +1,7 @@
-import { SimpleOpeningHours } from '../src/simpleOpeningHours';
+import { OpeningHours } from '../src/openingHours';
 
 test('table check', () => {
-  const table = new SimpleOpeningHours('Mo-Sa 06:00-22:00').getTable();
+  const table = new OpeningHours('Mo-Sa 06:00-22:00').getTable();
 
   expect(table).toEqual({
     su: [],
@@ -16,7 +16,7 @@ test('table check', () => {
 });
 
 test('complex time table check', () => {
-  const table = new SimpleOpeningHours('Mo-Sa 06:00-14:00,15:00-22:00').getTable();
+  const table = new OpeningHours('Mo-Sa 06:00-14:00,15:00-22:00').getTable();
 
   expect(table).toEqual({
     su: [],
@@ -31,7 +31,7 @@ test('complex time table check', () => {
 });
 
 test('complex time table check with pass midnight', () => {
-  const table = new SimpleOpeningHours('Mo-Sa 06:00-14:00,15:00-01:00').getTable();
+  const table = new OpeningHours('Mo-Sa 06:00-14:00,15:00-01:00').getTable();
 
   expect(table).toEqual({
     su: [],

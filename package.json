@@ -1,8 +1,8 @@
 {
-  "name": "simple-opening-hours",
+  "name": "1-line-opening-hours",
   "version": "0.2.0",
-  "description": "Simple parser for OpenStreetMap opening_hours",
-  "main": "lib/simpleOpeningHours.js",
+  "description": "Simple parser for OpenStreetMap `opening_hours`",
+  "main": "lib/openingHours.js",
   "files": [
     "lib/**/*"
   ],
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/snowpact/simple-opening-hours.git"
+    "url": "git+https://github.com/snowpact/1-line-opening-hours.git"
   },
   "keywords": [
     "opening_hours",
@@ -21,12 +21,12 @@
     "openstreetmap",
     "timetable"
   ],
-  "author": "webk1d",
+  "author": "SnowPact",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/snowpact/simple-opening-hours/issues"
+    "url": "https://github.com/snowpact/1-line-opening-hours/issues"
   },
-  "homepage": "https://github.com/snowpact/simple-opening-hours#readme",
+  "homepage": "https://github.com/snowpact/1-line-opening-hours#readme",
   "devDependencies": {
     "@types/jest": "^26.0.22",
     "@types/node": "^14.14.37",

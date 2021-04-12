@@ -1,37 +1,39 @@
 {
   "name": "simple-opening-hours",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Simple parser for OpenStreetMap opening_hours",
   "main": "lib/simpleOpeningHours.js",
+  "files": [
+    "lib/**/*"
+  ],
   "scripts": {
-    "compile": "tsc",
-    "develop": "compile & watch",
-    "test": "yarn jest"
-  },
-  "directories": {
-    "example": "example"
+    "test": "yon jest",
+    "build": "tsc -p .",
+    "prepublish": "rm -rf ./lib && yon build"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wbkd/simple-opening-hours.git"
+    "url": "git+https://github.com/snowpact/simple-opening-hours.git"
   },
   "keywords": [
     "opening_hours",
     "osm",
-    "openstreetmap"
+    "openstreetmap",
+    "timetable"
   ],
   "author": "webk1d",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/wbkd/simple-opening-hours/issues"
+    "url": "https://github.com/snowpact/simple-opening-hours/issues"
   },
-  "homepage": "https://github.com/wbkd/simple-opening-hours#readme",
+  "homepage": "https://github.com/snowpact/simple-opening-hours#readme",
   "devDependencies": {
     "@types/jest": "^26.0.22",
     "@types/node": "^14.14.37",
     "jest": "^26.6.3",
     "prettier": "^2.2.1",
     "ts-jest": "^26.5.4",
-    "typescript": "^3.3.4000"
+    "typescript": "^3.3.4000",
+    "yarn-or-npm": "^3.0.1"
   }
 }

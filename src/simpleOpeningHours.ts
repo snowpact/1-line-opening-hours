@@ -1,8 +1,19 @@
+export interface OpeningHoursData {
+  su: string[];
+  mo: string[];
+  tu: string[];
+  we: string[];
+  th: string[];
+  fr: string[];
+  sa: string[];
+  ph: string[];
+}
+
 export class SimpleOpeningHours {
   private MAX_CLOSE_TIME = '24:00';
   private MIN_OPEN_TIME = '00:00';
 
-  private openingHours = {
+  private openingHours: OpeningHoursData = {
     su: [],
     mo: [],
     tu: [],
@@ -16,14 +27,14 @@ export class SimpleOpeningHours {
   /**
    * Creates the OpeningHours Object with OSM opening_hours string
    */
-  constructor(inp: string) {
-    this.parse(inp);
+  constructor(stringOpeningHours: string) {
+    this.parse(stringOpeningHours);
   }
 
   /**
    * returns the OpeningHours Object
    */
-  public getTable() {
+  public getTable(): OpeningHoursData {
     return this.openingHours;
   }
 
@@ -36,15 +47,13 @@ export class SimpleOpeningHours {
 
     let times = this.getTimesOfDay(today);
 
-    if (times.length > 0) {
-      for (let i = 0; i < times.length; i++) {
-        let timeSlots = this.geTimeSlots(times[i]);
-        if (
-          this.compareTime(todayTime, timeSlots[0]) != -1 &&
-          this.compareTime(timeSlots[1], todayTime) != -1
-        ) {
-          return true;
-        }
+    for (let i = 0; i < times.length; i++) {
+      let timeSlots = this.geTimeSlots(times[i]);
+      if (
+        this.compareTime(todayTime, timeSlots[0]) != -1 &&
+        this.compareTime(timeSlots[1], todayTime) != -1
+      ) {
+        return true;
       }
     }
 
@@ -343,7 +352,7 @@ export class SimpleOpeningHours {
     return times;
   }
 
-  public toString(): string {
+  public toReadableString(): string {
     const weekDays = {
       mo: 'Monday',
       tu: 'Tuesday',

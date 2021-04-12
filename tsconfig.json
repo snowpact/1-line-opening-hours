@@ -9,9 +9,9 @@
         "preserveConstEnums": true,
         "sourceMap": true,
         "esModuleInterop": true,
-        "outDir": "./dist"
+        "outDir": "./lib"
     },
-    "include": ["src/**/*", "tests/**/*"],
+    "include": ["src/**/*"],
     "exclude": ["node_modules", "**/__tests__/*"]
 }
 

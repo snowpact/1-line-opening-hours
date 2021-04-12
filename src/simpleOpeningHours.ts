@@ -1,4 +1,7 @@
 export class SimpleOpeningHours {
+  private MAX_CLOSE_TIME = '24:00';
+  private MIN_OPEN_TIME = '00:00';
+
   private openingHours = {
     su: [],
     mo: [],
@@ -29,48 +32,58 @@ export class SimpleOpeningHours {
    */
   public isOpenOn(date: Date): boolean {
     let today = date.getDay();
-    let todayTime = date.getHours() + ':' + date.getMinutes();
+    let todayTime = this.formatTime(date);
 
-    let isOpen = false;
     let times = this.getTimesOfDay(today);
-    let timesOfLastDay = this.getTimesOfDay(today - 1);
 
-    if (timesOfLastDay.length > 0) {
-      let timeDataOfLastDay = timesOfLastDay[timesOfLastDay.length - 1].split('-');
-      if (
-        this.isExceedTime({
-          openingTime: timeDataOfLastDay[0],
-          closingTime: timeDataOfLastDay[1],
-        }) &&
-        this.checkExceedTime({
-          closingTime: timeDataOfLastDay[1],
-          now: todayTime,
-        })
-      ) {
-        isOpen = true;
+    if (times.length > 0) {
+      for (let i = 0; i < times.length; i++) {
+        let timeSlots = this.geTimeSlots(times[i]);
+        if (
+          this.compareTime(todayTime, timeSlots[0]) != -1 &&
+          this.compareTime(timeSlots[1], todayTime) != -1
+        ) {
+          return true;
+        }
       }
     }
-    if (times.length > 0) {
-      times.forEach(time => {
-        //TODO: times like 09:00+ are not supported here
-        let timedata = time.split('-');
-        if (
-          this.isExceedTime({
-            openingTime: timedata[0],
-            closingTime: timedata[1],
-          })
-        ) {
-          timedata[1] = '23:59';
-        }
-        if (
-          this.compareTime(todayTime, timedata[0]) != -1 &&
-          this.compareTime(timedata[1], todayTime) != -1
-        ) {
-          isOpen = true;
-        }
-      });
+
+    if (this.isCurrentlyOnNightServiceOfYesterday(date)) {
+      return true;
     }
-    return isOpen;
+
+    return false;
+  }
+
+  private geTimeSlots(time: string): [string, string] {
+    if (time.includes('+')) {
+      return [time.split('+')[0], this.MAX_CLOSE_TIME];
+    }
+    const timeSlots = time.split('-');
+
+    if (this.isNightlyService(timeSlots[0], timeSlots[1])) {
+      return [timeSlots[0], this.MAX_CLOSE_TIME];
+    }
+
+    return [timeSlots[0], timeSlots[1]];
+  }
+
+  private isCurrentlyOnNightServiceOfYesterday(date: Date): boolean {
+    const yesterdayTimes = this.getTimesOfDay(date.getDay() - 1);
+    if (yesterdayTimes.length === 0) {
+      return false;
+    }
+
+    let yesterdayLastTimeRange = yesterdayTimes[yesterdayTimes.length - 1].split('-');
+    if (
+      this.isNightlyService(yesterdayLastTimeRange[0], yesterdayLastTimeRange[1]) &&
+      this.compareTime(yesterdayLastTimeRange[1], this.formatTime(date)) !== -1 &&
+      this.compareTime(this.formatTime(date), this.MIN_OPEN_TIME) !== -1
+    ) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -84,15 +97,15 @@ export class SimpleOpeningHours {
    * Parses the input and creates openingHours Object
    */
   private parse(inp) {
-    inp = this.simplify(inp);
-    let parts = this.splitHard(inp);
+    const parts = this.splitHard(this.simplify(inp));
+
     parts.forEach(part => {
       this.parseHardPart(part);
     });
   }
 
   private simplify(input: string): string {
-    if (input == '24/7') {
+    if (input === '24/7') {
       input = 'mo-su 00:00-24:00; ph 00:00-24:00';
     }
     input = input.toLocaleLowerCase();
@@ -110,7 +123,15 @@ export class SimpleOpeningHours {
 
     input = input.replace(' ;', ';');
     input = input.replace('; ', ';');
+
     return input;
+  }
+
+  /**
+   * Get formatted time for date
+   */
+  private formatTime(date: Date): string {
+    return date.getHours() + ':' + date.getMinutes();
   }
 
   /**
@@ -173,8 +194,10 @@ export class SimpleOpeningHours {
 
   private parseDays(part: string): string[] {
     part = part.toLowerCase();
+
     let days: string[] = [];
     let softParts = part.split(',');
+
     softParts.forEach(part => {
       let rangeCount = (part.match(/\-/g) || []).length;
       if (rangeCount == 0) {
@@ -223,19 +246,19 @@ export class SimpleOpeningHours {
    * Creates a range between two number.
    * if the max value is 6 a range bewteen 6 and 2 is 6, 0, 1, 2
    */
-  private calcRange(min: number, max: number, maxval): number[] {
+  private calcRange(min: number, max: number, maxVal: number): number[] {
     if (min == max) {
       return [min];
     }
     let range = [min];
-    let rangepoint = min;
-    while (rangepoint < (min < max ? max : maxval)) {
-      rangepoint++;
-      range.push(rangepoint);
+    let rangePoint = min;
+    while (rangePoint < (min < max ? max : maxVal)) {
+      rangePoint++;
+      range.push(rangePoint);
     }
     if (min > max) {
       //add from first in list to max value
-      range = range.concat(this.calcRange(0, max, maxval));
+      range = range.concat(this.calcRange(0, max, maxVal));
     }
 
     return range;
@@ -266,8 +289,8 @@ export class SimpleOpeningHours {
   private checkDay(inp: string): boolean {
     let days = ['mo', 'tu', 'we', 'th', 'fr', 'sa', 'su', 'ph'];
     if (inp.match(/\-/g)) {
-      let rangelements = inp.split('-');
-      if (days.indexOf(rangelements[0]) !== -1 && days.indexOf(rangelements[1]) !== -1) {
+      let ranges = inp.split('-');
+      if (days.indexOf(ranges[0]) !== -1 && days.indexOf(ranges[1]) !== -1) {
         return true;
       }
     } else {
@@ -296,7 +319,7 @@ export class SimpleOpeningHours {
     return 0;
   }
 
-  private isExceedTime({ openingTime, closingTime }: IsExceedTimeOptions) {
+  private isNightlyService(openingTime: string, closingTime: string) {
     let date1 = new Date('2016-01-01 ' + openingTime);
     let date2 = new Date('2016-01-01 ' + closingTime);
     if (date1 > date2) {
@@ -320,19 +343,7 @@ export class SimpleOpeningHours {
     return times;
   }
 
-  private checkExceedTime({ now, closingTime }: CheckExceedTimeOptions) {
-    const beginExtraTime = new Date('1970-01-01 ' + '00:00');
-    const endExtraTime = new Date('1970-01-01 ' + closingTime);
-    let date = new Date('1970-01-01 ' + now);
-    if (date >= beginExtraTime && date < endExtraTime) {
-      return true;
-    }
-    return false;
-  }
-
   public toString(): string {
-    const table = this.getTable();
-
     const weekDays = {
       mo: 'Monday',
       tu: 'Tuesday',
@@ -353,14 +364,4 @@ export class SimpleOpeningHours {
       })
       .join('\n');
   }
-}
-
-interface IsExceedTimeOptions {
-  openingTime: string;
-  closingTime: string;
-}
-
-interface CheckExceedTimeOptions {
-  now: string;
-  closingTime: string;
 }

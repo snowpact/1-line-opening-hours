@@ -2,7 +2,7 @@
   "name": "simple-opening-hours",
   "version": "0.1.1",
   "description": "Simple parser for OpenStreetMap opening_hours",
-  "main": "dist/simple-opening-hours.js",
+  "main": "lib/simpleOpeningHours.js",
   "scripts": {
     "compile": "tsc",
     "develop": "compile & watch",

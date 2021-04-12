@@ -1,4 +1,4 @@
-import { SimpleOpeningHours } from '../src';
+import { SimpleOpeningHours } from '../src/simpleOpeningHours';
 
 test('table check', () => {
   const table = new SimpleOpeningHours('Mo-Sa 06:00-22:00').getTable();

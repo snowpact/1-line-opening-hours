@@ -1,4 +1,4 @@
-import { SimpleOpeningHours as SOH } from '../src';
+import { SimpleOpeningHours as SOH } from '../src/simpleOpeningHours';
 
 // You can use https://dencode.com/date to check the week day of a date
 
@@ -34,6 +34,13 @@ test('exceeding midnight cases', () => {
 
   //when is open only monday and check tuesday at 05:30 AM should be close
   expectFalse(new SOH('Mo 23:00-05:00').isOpenOn(new Date('2021-04-06 05:30')));
+});
+
+test('plus cases', () => {
+  // 2016-10-01 => saturday
+  expectTrue(new SOH('Sa 09:00+').isOpenOn(new Date('2016-10-01 18:00')));
+  expectFalse(new SOH('Sa 09:00+').isOpenOn(new Date('2016-10-02 00:00')));
+  expectFalse(new SOH('Sa 09:00+').isOpenOn(new Date('2016-10-01 08:00')));
 });
 
 test('classic cases', () => {

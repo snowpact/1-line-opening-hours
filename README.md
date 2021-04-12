@@ -28,7 +28,7 @@ yarn add 1-line-opening-hours
 ```
 ### Usage
 ```javascript
-const openingHours = new SimpleOpeningHours('Mo-Sa 06:00-22:00');
+const openingHours = new OpeningHours('Mo-Sa 06:00-22:00');
 
 console.log('Is this open now?', openingHours.isOpenNow());
 console.log('Is this open on 2016-10-01 18:00?', openingHours.isOpenOn(new Date('2016-10-01 18:00')));

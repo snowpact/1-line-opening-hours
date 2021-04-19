@@ -44,3 +44,8 @@ test('classic cases', () => {
   expect(new OH('Mo-Sa off').isOpenOn(new Date('2016-10-01 18:00'))).toBe(false);
   expect(new OH('Mo-Sa 06:00-22:00').isOpenOn(new Date('2016-10-01 05:00'))).toBe(false);
 });
+
+test('weird cases', () => {
+  // 2016-10-01 => saturday
+  expect(new OH('Mo 23:00-05:00').isOpenOn(new Date('2021-04-06 01:00'))).toBe(true);
+});

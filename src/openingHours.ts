@@ -42,6 +42,8 @@ export class OpeningHours {
    * Returns if the OpeningHours match on given Date
    */
   public isOpenOn(date: Date): boolean {
+    console.log(date);
+
     let today = date.getDay();
     let todayTime = this.formatTime(date);
 
@@ -317,8 +319,9 @@ export class OpeningHours {
    * if time1 == time2 -> 0
    */
   private compareTime(time1: string, time2: string) {
-    let date1 = new Date('2016-01-01 ' + time1);
-    let date2 = new Date('2016-01-01 ' + time2);
+    const date1 = this.constructDateFromTime(time1);
+    const date2 = this.constructDateFromTime(time2);
+
     if (date1 > date2) {
       return 1;
     }
@@ -329,12 +332,42 @@ export class OpeningHours {
   }
 
   private isNightlyService(openingTime: string, closingTime: string) {
-    let date1 = new Date('2016-01-01 ' + openingTime);
-    let date2 = new Date('2016-01-01 ' + closingTime);
+    const date1 = this.constructDateFromTime(openingTime);
+    const date2 = this.constructDateFromTime(closingTime);
+
     if (date1 > date2) {
       return true;
     }
     return false;
+  }
+
+  private constructDateFromTime(time: string): Date {
+    const constructedDate = new Date('2016-01-01');
+
+    const parsedOpeningTime = this.getHoursAndMinutes(time);
+    constructedDate.setHours(parsedOpeningTime[0], parsedOpeningTime[1]);
+
+    console.log(constructedDate);
+
+    return constructedDate;
+  }
+
+  private getHoursAndMinutes(time: string): [number, number] {
+    if (!time) {
+      return [23, 59];
+    }
+
+    const hoursAndMinutes = time.split(':');
+
+    if (
+      hoursAndMinutes.length !== 2 ||
+      Number.isNaN(hoursAndMinutes[0]) ||
+      Number.isNaN(hoursAndMinutes[1])
+    ) {
+      return [23, 59];
+    }
+
+    return [parseInt(hoursAndMinutes[0], 10), parseInt(hoursAndMinutes[1], 10)];
   }
 
   private getTimesOfDay(day: number): string[] {

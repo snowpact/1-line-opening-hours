@@ -17,15 +17,15 @@ test('off cases', () => {
 
 test('exceeding midnight cases', () => {
   // 2021-04-06 => it's tuesday, and the service should be open from 23:00 monday to 05:00 tuesday
-  expect(new OH('Mo 23:00-05:00').isOpenOn(new Date('2021-04-06 01:00'))).toBe(true);
+  expect(new OH('Mo 23:00-05:00').isOpenOn(new Date('2021-04-06 02:00'))).toBe(true);
   expect(new OH('Mo-Sa 23:00-05:00').isOpenOn(new Date('2021-04-06 01:00'))).toBe(true);
 
   // 2021-04-05 => it's monday
   expect(new OH('Mo 23:00-05:00').isOpenOn(new Date('2021-04-05 05:30'))).toBe(false);
-  expect(new OH('Mo 23:00-05:00').isOpenOn(new Date('2021-04-05 23:00'))).toBe(true);
+  expect(new OH('Mo 23:00-05:00').isOpenOn(new Date('2021-04-05 01:00'))).toBe(true);
 
   //when is open only monday and check tuesday at 05:30 AM should be close
-  expect(new OH('Mo 23:00-05:00').isOpenOn(new Date('2021-04-06 05:30'))).toBe(false);
+  expect(new OH('Mo 23:00-05:00').isOpenOn(new Date('2021-04-06 07:30'))).toBe(false);
 });
 
 test('plus cases', () => {
@@ -47,5 +47,5 @@ test('classic cases', () => {
 
 test('weird cases', () => {
   // 2016-10-01 => saturday
-  expect(new OH('Mo 23:00-05:00').isOpenOn(new Date('2021-04-06 01:00'))).toBe(true);
+  expect(new OH('Mo 23:00-05:00').isOpenOn(new Date('2021-04-06 02:00'))).toBe(true);
 });

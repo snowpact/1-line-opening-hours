@@ -14,7 +14,7 @@ const SIMPLE_DAYS_NAMES = ['su', 'mo', 'tu', 'we', 'th', 'fr', 'sa'];
 export interface NextOpeningDay {
   times: string[];
   nextDay: string;
-  isTomorrow: boolean;
+  reopensInDay: number;
 }
 
 export interface FormatHours {
@@ -134,83 +134,9 @@ export class OpeningHours {
     return {
       times,
       nextDay: SIMPLE_DAYS_NAMES[i],
-      isTomorrow: i === today + 1 ? true : false,
+      reopensInDay: i - today,
     };
   }
-
-  private openAt = (formatHours, date: Date, nextDay): string | null => {
-    if (formatHours.length > 1) {
-      const now = this.constructDateFromTime(`${date.getHours()}:${date.getMinutes()}`);
-      if (nextDay) {
-        return formatHours[0].hour;
-      }
-      for (let i = 0; i < formatHours.length - 1; i = i + 2) {
-        if (now < formatHours[i].date) {
-          console.log(i);
-          return formatHours[i].hour;
-        }
-      }
-    }
-    return null;
-  };
-
-  private openUntil = (formatHours: FormatHours[], date: Date) => {
-    if (formatHours.length > 1) {
-      const now = this.constructDateFromTime(`${date.getHours()}:${date.getMinutes()}`);
-      for (let i = 1; i < formatHours.length; i = i + 2) {
-        if (now < formatHours[i].date || now > formatHours[formatHours.length - 1].date) {
-          if (formatHours[i].date < formatHours[i - 1].date) {
-            return { formatHours: formatHours[i].hour, isTomorrow: true };
-          }
-          return { formatHours: formatHours[i].hour, isTomorrow: false };
-        }
-      }
-    }
-    return { formatHours: 'today', isTomorrow: false };
-  };
-
-  public checkOpeningTime = (date: Date) => {
-    const isOpenNow = this.isOpenOn(date);
-
-    const allHours = this.getTable();
-
-    const dayIndex = date.getDay();
-    const daySimpleIndex = SIMPLE_DAYS_NAMES[dayIndex];
-    const todayHours = allHours[daySimpleIndex];
-    if (!todayHours || todayHours.length === 0) {
-      return this.nextDayOpeningTime(allHours, date);
-    }
-    const formatHours: FormatHours[] = [];
-    todayHours.map(todayHour =>
-      todayHour
-        .split('-')
-        .map(hour => formatHours.push({ date: this.constructDateFromTime(hour), hour })),
-    );
-    if (isOpenNow) {
-      const open = this.openUntil(formatHours, date);
-      return {
-        open: true,
-        openUntil: open.formatHours,
-        openAt: null,
-        weekDay: null,
-        isTomorrow: open.isTomorrow,
-      };
-    }
-    if (!isOpenNow) {
-      const hour = this.openAt(formatHours, date, undefined);
-
-      if (!hour) {
-        return this.nextDayOpeningTime(allHours, date);
-      }
-      return {
-        open: false,
-        openUntil: null,
-        openAt: hour,
-        weekDay: null,
-        isTomorrow: false,
-      };
-    }
-  };
 
   private nextDayOpeningTime = (allHours: OpeningHoursData, date: Date) => {
     const nextDay: NextOpeningDay = this.getNextOpeningDay(date);
@@ -218,52 +144,106 @@ export class OpeningHours {
     if (!nextDayHours || nextDayHours.length === 0) {
       return null;
     }
-    const formatNextDayHours: FormatHours[] = [];
-    nextDayHours.map(nextDayHour =>
-      nextDayHour
-        .split('-')
-        .map(hour => formatNextDayHours.push({ date: this.constructDateFromTime(hour), hour })),
-    );
-    const hour = this.openAt(formatNextDayHours, date, nextDay.nextDay);
+
+    const formatNextDayHours: FormatHours[] = this.serializeHoursOfDay(nextDayHours);
+
+    const hour = this.opensAt(formatNextDayHours, date, nextDay.nextDay);
     return {
       open: false,
       openUntil: null,
-      openAt: hour,
-      weekDay: this.formatWeekDay(nextDay.nextDay) ?? null,
-      isTomorrow: nextDay.isTomorrow,
+      opensAt: hour,
+      weekDay: nextDay.nextDay ?? null,
+      reopensInDay: nextDay.reopensInDay,
     };
   };
 
-  public checkOpeningTimeNow = () => {
-    return this.checkOpeningTime(new Date());
+  /**
+   * Returns the next opening hours
+   */
+  private opensAt = (
+    formatHours: FormatHours[],
+    date: Date,
+    nextDay: string | undefined,
+  ): string | null => {
+    if (formatHours.length > 1) {
+      const now = this.constructDateFromTime(`${date.getHours()}:${date.getMinutes()}`);
+      if (nextDay) {
+        return formatHours[0].hour;
+      }
+      for (let i = 0; i < formatHours.length - 1; i = i + 2) {
+        if (now < formatHours[i].date) {
+          return formatHours[i].hour;
+        }
+      }
+    }
+    return null;
   };
 
-  public formatWeekDay = (weekDay: string): string => {
-    switch (weekDay) {
-      case 'mo':
-        return 'monday';
-
-      case 'tu':
-        return 'tuesday';
-
-      case 'we':
-        return 'wednesday';
-
-      case 'th':
-        return 'thirsday';
-
-      case 'fr':
-        return 'friday';
-
-      case 'sa':
-        return 'saturday';
-
-      case 'su':
-        return 'sunday';
-
-      default:
-        return 'Tomorrow';
+  /**
+   * Returns the next closing hours
+   */
+  private openUntil = (formatHours: FormatHours[], date: Date) => {
+    if (formatHours.length > 1) {
+      const now = this.constructDateFromTime(`${date.getHours()}:${date.getMinutes()}`);
+      for (let i = 1; i < formatHours.length; i = i + 2) {
+        if (now < formatHours[i].date || i === formatHours.length - 1) {
+          if (formatHours[i].date < formatHours[i - 1].date) {
+            return { formatHours: formatHours[i].hour, reopensInDay: 1 };
+          }
+          return { formatHours: formatHours[i].hour, reopensInDay: 0 };
+        }
+      }
     }
+    return { formatHours: '24/7', reopensInDay: 0 };
+  };
+
+  public getFullOpeningTimeStatus = (date: Date) => {
+    const isOpenNow = this.isOpenOn(date);
+    const allHours = this.getTable();
+    const dayIndex = date.getDay();
+    const daySimpleIndex = SIMPLE_DAYS_NAMES[dayIndex];
+    const todayHours = allHours[daySimpleIndex];
+
+    if (!todayHours || todayHours.length === 0) {
+      return this.nextDayOpeningTime(allHours, date);
+    }
+
+    const formatHours: FormatHours[] = this.serializeHoursOfDay(todayHours);
+
+    if (!isOpenNow) {
+      const hour = this.opensAt(formatHours, date, undefined);
+      if (!hour) {
+        return this.nextDayOpeningTime(allHours, date);
+      }
+      return {
+        open: false,
+        openUntil: null,
+        opensAt: hour,
+        weekDay: null,
+        reopensInDay: 0,
+      };
+    }
+    return {
+      open: true,
+      openUntil: this.openUntil(formatHours, date).formatHours,
+      opensAt: null,
+      weekDay: null,
+      reopensInDay: this.openUntil(formatHours, date).reopensInDay,
+    };
+  };
+
+  private serializeHoursOfDay = (dayHours: string[]): FormatHours[] => {
+    const formatHours: FormatHours[] = [];
+    dayHours.map(todayHour =>
+      todayHour
+        .split('-')
+        .map(hour => formatHours.push({ date: this.constructDateFromTime(hour), hour })),
+    );
+    return formatHours;
+  };
+
+  public getTodayFullOpeningTimeStatus = () => {
+    return this.getFullOpeningTimeStatus(new Date());
   };
 
   /**

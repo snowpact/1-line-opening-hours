@@ -214,7 +214,7 @@ export class OpeningHours {
   };
 
   /**
-   * Returns next day open
+   * Returns next opening day
    */
   private getNextOpeningDay(date: Date): NextOpeningDay {
     const today = date.getDay();

@@ -116,45 +116,63 @@ export class OpeningHours {
   }
 
   /**
-   * Returns next day open
+   * Send more information about the current opening status, the next day that it will be opened...
    */
-  private getNextOpeningDay(date: Date): NextOpeningDay {
-    const today = date.getDay();
-    let times;
-    let i = today;
+  public getFullOpeningTimeStatus = (date: Date) => {
+    const isOpenNow = this.isOpenOn(date);
+    const allHours = this.getTable();
+    const dayIndex = date.getDay();
+    const daySimpleIndex = SIMPLE_DAYS_NAMES[dayIndex];
+    const todayHours = allHours[daySimpleIndex];
 
-    for (let key in this.openingHours) {
-      i = i === 7 ? 0 : i + 1;
-      times = this.getTimesOfDay(i);
-      if (times.length > 0) {
-        times = this.openingHours[key];
-        break;
+    if (!todayHours || todayHours.length === 0) {
+      return this.formatNextDayOpeningTime(allHours, date);
+    }
+
+    const formatHours: FormatHours[] = this.serializeHoursOfDay(todayHours);
+
+    if (!isOpenNow) {
+      const hour = this.opensAt(formatHours, date, undefined);
+      if (!hour) {
+        return this.formatNextDayOpeningTime(allHours, date);
+      }
+      return {
+        open: false,
+        openUntil: null,
+        opensAt: hour,
+        weekDay: null,
+        reopensInDay: 0,
+      };
+    }
+    return {
+      open: true,
+      openUntil: this.openUntil(formatHours, date).formatHours,
+      opensAt: null,
+      weekDay: null,
+      reopensInDay: this.openUntil(formatHours, date).reopensInDay,
+    };
+  };
+
+  public getTodayFullOpeningTimeStatus = () => {
+    return this.getFullOpeningTimeStatus(new Date());
+  };
+
+  /**
+   * Returns the next closing hours
+   */
+  private openUntil = (formatHours: FormatHours[], date: Date) => {
+    if (formatHours.length > 1) {
+      const now = this.constructDateFromTime(`${date.getHours()}:${date.getMinutes()}`);
+      for (let i = 1; i < formatHours.length; i = i + 2) {
+        if (now < formatHours[i].date || i === formatHours.length - 1) {
+          if (formatHours[i].date < formatHours[i - 1].date) {
+            return { formatHours: formatHours[i].hour, reopensInDay: 1 };
+          }
+          return { formatHours: formatHours[i].hour, reopensInDay: 0 };
+        }
       }
     }
-    return {
-      times,
-      nextDay: SIMPLE_DAYS_NAMES[i],
-      reopensInDay: i - today,
-    };
-  }
-
-  private nextDayOpeningTime = (allHours: OpeningHoursData, date: Date) => {
-    const nextDay: NextOpeningDay = this.getNextOpeningDay(date);
-    const nextDayHours = allHours[nextDay.nextDay];
-    if (!nextDayHours || nextDayHours.length === 0) {
-      return null;
-    }
-
-    const formatNextDayHours: FormatHours[] = this.serializeHoursOfDay(nextDayHours);
-
-    const hour = this.opensAt(formatNextDayHours, date, nextDay.nextDay);
-    return {
-      open: false,
-      openUntil: null,
-      opensAt: hour,
-      weekDay: nextDay.nextDay ?? null,
-      reopensInDay: nextDay.reopensInDay,
-    };
+    return { formatHours: '24/7', reopensInDay: 0 };
   };
 
   /**
@@ -180,61 +198,53 @@ export class OpeningHours {
   };
 
   /**
-   * Returns the next closing hours
+   * Returns next day open
    */
-  private openUntil = (formatHours: FormatHours[], date: Date) => {
-    if (formatHours.length > 1) {
-      const now = this.constructDateFromTime(`${date.getHours()}:${date.getMinutes()}`);
-      for (let i = 1; i < formatHours.length; i = i + 2) {
-        if (now < formatHours[i].date || i === formatHours.length - 1) {
-          if (formatHours[i].date < formatHours[i - 1].date) {
-            return { formatHours: formatHours[i].hour, reopensInDay: 1 };
-          }
-          return { formatHours: formatHours[i].hour, reopensInDay: 0 };
-        }
+  private getNextOpeningDay(date: Date): NextOpeningDay {
+    const today = date.getDay();
+    let times;
+    let i = today;
+
+    for (let key in this.openingHours) {
+      i = i === 7 ? 0 : i + 1;
+      times = this.getTimesOfDay(i);
+      if (times.length > 0) {
+        times = this.openingHours[key];
+        break;
       }
-    }
-    return { formatHours: '24/7', reopensInDay: 0 };
-  };
-
-  /**
-   * Send more information about the current opening status, the next day that it will be opened...
-   */
-  public getFullOpeningTimeStatus = (date: Date) => {
-    const isOpenNow = this.isOpenOn(date);
-    const allHours = this.getTable();
-    const dayIndex = date.getDay();
-    const daySimpleIndex = SIMPLE_DAYS_NAMES[dayIndex];
-    const todayHours = allHours[daySimpleIndex];
-
-    if (!todayHours || todayHours.length === 0) {
-      return this.nextDayOpeningTime(allHours, date);
-    }
-
-    const formatHours: FormatHours[] = this.serializeHoursOfDay(todayHours);
-
-    if (!isOpenNow) {
-      const hour = this.opensAt(formatHours, date, undefined);
-      if (!hour) {
-        return this.nextDayOpeningTime(allHours, date);
-      }
-      return {
-        open: false,
-        openUntil: null,
-        opensAt: hour,
-        weekDay: null,
-        reopensInDay: 0,
-      };
     }
     return {
-      open: true,
-      openUntil: this.openUntil(formatHours, date).formatHours,
-      opensAt: null,
-      weekDay: null,
-      reopensInDay: this.openUntil(formatHours, date).reopensInDay,
+      times,
+      nextDay: SIMPLE_DAYS_NAMES[i],
+      reopensInDay: i - today,
+    };
+  }
+
+  /**
+   * Returns format response wit the time and the next opening day
+   */
+  private formatNextDayOpeningTime = (allHours: OpeningHoursData, date: Date) => {
+    const nextDay: NextOpeningDay = this.getNextOpeningDay(date);
+    const nextDayHours = allHours[nextDay.nextDay];
+    if (!nextDayHours || nextDayHours.length === 0) {
+      return null;
+    }
+
+    const formatNextDayHours: FormatHours[] = this.serializeHoursOfDay(nextDayHours);
+
+    const hour = this.opensAt(formatNextDayHours, date, nextDay.nextDay);
+    return {
+      open: false,
+      openUntil: null,
+      opensAt: hour,
+      weekDay: nextDay.nextDay ?? null,
+      reopensInDay: nextDay.reopensInDay,
     };
   };
 
+  /**
+   * Serialize hours of day to an array
+   */
   private serializeHoursOfDay = (dayHours: string[]): FormatHours[] => {
     const formatHours: FormatHours[] = [];
     dayHours.map(todayHour =>
@@ -243,10 +253,6 @@ export class OpeningHours {
         .map(hour => formatHours.push({ date: this.constructDateFromTime(hour), hour })),
     );
     return formatHours;
-  };
-
-  public getTodayFullOpeningTimeStatus = () => {
-    return this.getFullOpeningTimeStatus(new Date());
   };
 
   /**

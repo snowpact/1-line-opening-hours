@@ -197,6 +197,9 @@ export class OpeningHours {
     return { formatHours: '24/7', reopensInDay: 0 };
   };
 
+  /**
+   * Send more information about the current opening status, the next day that it will be opened...
+   */
   public getFullOpeningTimeStatus = (date: Date) => {
     const isOpenNow = this.isOpenOn(date);
     const allHours = this.getTable();

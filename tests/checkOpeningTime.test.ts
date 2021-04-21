@@ -7,10 +7,12 @@ test('classic cases', () => {
     ).getFullOpeningTimeStatus(new Date('2021-04-20 15:00')),
   ).toMatchObject({
     open: false,
-    opensAt: '11:00',
     openUntil: null,
-    weekDay: 'we',
-    reopensInDay: 1,
+    nextReopening: {
+      hour: '11:00',
+      day: 'we',
+      opensInDay: 1,
+    },
   });
   expect(
     new OH(
@@ -18,10 +20,12 @@ test('classic cases', () => {
     ).getFullOpeningTimeStatus(new Date('2021-04-20 15:00')),
   ).toMatchObject({
     open: false,
-    opensAt: '11:00',
     openUntil: null,
-    weekDay: 'th',
-    reopensInDay: 2,
+    nextReopening: {
+      hour: '11:00',
+      day: 'th',
+      opensInDay: 2,
+    },
   });
   expect(
     new OH(
@@ -29,10 +33,12 @@ test('classic cases', () => {
     ).getFullOpeningTimeStatus(new Date('2021-04-20 09:00')),
   ).toMatchObject({
     open: false,
-    opensAt: '11:00',
     openUntil: null,
-    weekDay: null,
-    reopensInDay: 0,
+    nextReopening: {
+      hour: '11:00',
+      day: 'tu',
+      opensInDay: 0,
+    },
   });
   expect(
     new OH(
@@ -40,10 +46,8 @@ test('classic cases', () => {
     ).getFullOpeningTimeStatus(new Date('2021-04-20 11:00')),
   ).toMatchObject({
     open: true,
-    opensAt: null,
     openUntil: '13:00',
-    weekDay: null,
-    reopensInDay: 0,
+    nextReopening: null,
   });
   expect(
     new OH(
@@ -51,9 +55,7 @@ test('classic cases', () => {
     ).getFullOpeningTimeStatus(new Date('2021-04-20 19:00')),
   ).toMatchObject({
     open: true,
-    opensAt: null,
     openUntil: '02:00',
-    weekDay: null,
-    reopensInDay: 1,
+    nextReopening: null,
   });
 });

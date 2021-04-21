@@ -200,14 +200,14 @@ export class OpeningHours {
     nextDay: string | undefined,
   ): string => {
     if (formatHours.length > 1) {
-    }
-    const now = this.constructDateFromTime(`${date.getUTCHours()}:${date.getUTCMinutes()}`);
-    if (nextDay) {
-      return formatHours[0].hour;
-    }
-    for (let i = 0; i < formatHours.length - 1; i = i + 2) {
-      if (now < formatHours[i].date) {
-        return formatHours[i].hour;
+      const now = this.constructDateFromTime(`${date.getUTCHours()}:${date.getUTCMinutes()}`);
+      if (nextDay) {
+        return formatHours[0].hour;
+      }
+      for (let i = 0; i < formatHours.length - 1; i = i + 2) {
+        if (now < formatHours[i].date) {
+          return formatHours[i].hour;
+        }
       }
     }
     return 'close';

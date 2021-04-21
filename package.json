@@ -1,6 +1,6 @@
 {
   "name": "1-line-opening-hours",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Simple parser for OpenStreetMap `opening_hours`",
   "main": "lib/openingHours.js",
   "files": [

@@ -34,3 +34,13 @@ console.log('Is this open now?', openingHours.isOpenNow());
 console.log('Is this open on 2016-10-01 18:00?', openingHours.isOpenOn(new Date('2016-10-01 18:00')));
 console.table(openingHours.getTable());
 ```	
+
+### API
+
+| Method | Description | Return value |
+|--------|-------------|--------------|
+| `isOpenNow()` | Check whether the establishment is open now based on the provided opening hour | `true` or `false` 
+| `isOpenOn(date: Date)` | Same than above for any date | `true` or `false` 
+| `getTable()` | Get an array of each day and the corresponding opening time | `{ su: [], mo: ['06:00-22:00'] ... }`
+| `getFullStatusOfToday()` | Send more information about the current opening status, the next day that it will be opened... | `{ open: false openUntil: null, nextReopening: { hour: '11:00', day: 'tu', opensInDay: 0 }`
+| `getFullStatusOfDay(date: Date)` | Same than above for any date | `{ open: false openUntil: null, nextReopening: { hour: '11:00', day: 'tu', opensInDay: 0 }`

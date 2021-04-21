@@ -22,13 +22,13 @@ export interface NextReopening {
   opensInDay: number;
 }
 
-export interface GetFullOpeningTimeStatus {
+export interface FullDayStatus {
   open: boolean;
   openUntil: string | null;
   nextReopening: NextReopening | null;
 }
 
-export interface FormatHours {
+interface FormatHours {
   date: Date;
   hour: string;
 }
@@ -63,7 +63,7 @@ export class OpeningHours {
   }
 
   /**
-   * Returns if the OpeningHours match on given Date
+   * Check whether the establishment is open on date based on the provided opening hour
    */
   public isOpenOn(date: Date): boolean {
     let today = date.getDay();
@@ -86,6 +86,13 @@ export class OpeningHours {
     }
 
     return false;
+  }
+
+  /**
+   * Check whether the establishment is open now based on the provided opening hour
+   */
+  public isOpenNow(): boolean {
+    return this.isOpenOn(new Date());
   }
 
   private geTimeSlots(time: string): [string, string] {
@@ -120,16 +127,9 @@ export class OpeningHours {
   }
 
   /**
-   * returns if the OpeningHours match now
-   */
-  public isOpenNow(): boolean {
-    return this.isOpenOn(new Date());
-  }
-
-  /**
    * Send more information about the current opening status, the next day that it will be opened...
    */
-  public getFullOpeningTimeStatus = (date: Date): GetFullOpeningTimeStatus => {
+  public getFullStatusOfDay = (date: Date): FullDayStatus => {
     const isOpenNow = this.isOpenOn(date);
     const allHours = this.getTable();
     const dayIndex = date.getDay();
@@ -172,8 +172,8 @@ export class OpeningHours {
     };
   };
 
-  public getTodayFullOpeningTimeStatus = () => {
-    return this.getFullOpeningTimeStatus(new Date());
+  public getFullStatusOfToday = () => {
+    return this.getFullStatusOfDay(new Date());
   };
 
   /**
@@ -199,8 +199,6 @@ export class OpeningHours {
     date: Date,
     nextDay: string | undefined,
   ): string => {
-    if (formatHours.length > 1) {
-    }
     const now = this.constructDateFromTime(`${date.getHours()}:${date.getMinutes()}`);
     if (nextDay) {
       return formatHours[0].hour;

@@ -14,6 +14,7 @@ const SIMPLE_DAYS_NAMES = ['su', 'mo', 'tu', 'we', 'th', 'fr', 'sa'];
 export interface NextOpeningDay {
   times: string[];
   nextDay: string;
+  isTomorrow: boolean;
 }
 
 export interface FormatHours {
@@ -121,6 +122,7 @@ export class OpeningHours {
     const today = date.getDay();
     let times;
     let i = today;
+
     for (let key in this.openingHours) {
       i = i === 7 ? 0 : i + 1;
       times = this.getTimesOfDay(i);
@@ -132,6 +134,7 @@ export class OpeningHours {
     return {
       times,
       nextDay: SIMPLE_DAYS_NAMES[i],
+      isTomorrow: i === today + 1 ? true : false,
     };
   }
 
@@ -204,7 +207,7 @@ export class OpeningHours {
   };
 
   private nextDayOpeningTime = (allHours: OpeningHoursData, date: Date) => {
-    const nextDay: NextOpeningDay = this.getNextOpeningDay(new Date());
+    const nextDay: NextOpeningDay = this.getNextOpeningDay(date);
     const nextDayHours = allHours[nextDay.nextDay];
     if (!nextDayHours || nextDayHours.length === 0) {
       return null;
@@ -220,7 +223,7 @@ export class OpeningHours {
       open: false,
       openUntil: null,
       openAt: hour,
-      weekDay: this.formatWeekDay(nextDay.nextDay) ?? null,
+      weekDay: nextDay.isTomorrow ? 'tomorrow' : this.formatWeekDay(nextDay.nextDay) ?? null,
     };
   };
 
@@ -252,7 +255,7 @@ export class OpeningHours {
         return 'sunday';
 
       default:
-        return 'today';
+        return 'Tomorrow';
     }
   };
 

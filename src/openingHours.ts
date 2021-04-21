@@ -181,7 +181,7 @@ export class OpeningHours {
    */
   private openUntil = (formatHours: FormatHours[], date: Date): string => {
     if (formatHours.length > 1) {
-      const now = this.constructDateFromTime(`${date.getHours()}:${date.getMinutes()}`);
+      const now = this.constructDateFromTime(`${date.getUTCHours()}:${date.getUTCMinutes()}`);
       for (let i = 1; i < formatHours.length; i = i + 2) {
         if (now < formatHours[i].date || i === formatHours.length - 1) {
           return formatHours[i].hour;
@@ -199,13 +199,15 @@ export class OpeningHours {
     date: Date,
     nextDay: string | undefined,
   ): string => {
-    const now = this.constructDateFromTime(`${date.getHours()}:${date.getMinutes()}`);
-    if (nextDay) {
-      return formatHours[0].hour;
-    }
-    for (let i = 0; i < formatHours.length - 1; i = i + 2) {
-      if (now < formatHours[i].date) {
-        return formatHours[i].hour;
+    if (formatHours.length > 1) {
+      const now = this.constructDateFromTime(`${date.getUTCHours()}:${date.getUTCMinutes()}`);
+      if (nextDay) {
+        return formatHours[0].hour;
+      }
+      for (let i = 0; i < formatHours.length - 1; i = i + 2) {
+        if (now < formatHours[i].date) {
+          return formatHours[i].hour;
+        }
       }
     }
     return 'close';
@@ -304,7 +306,7 @@ export class OpeningHours {
    * Get formatted time for date
    */
   private formatTime(date: Date): string {
-    return date.getHours() + ':' + date.getMinutes();
+    return date.getUTCHours() + ':' + date.getUTCMinutes();
   }
 
   /**

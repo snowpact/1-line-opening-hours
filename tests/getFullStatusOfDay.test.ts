@@ -43,7 +43,7 @@ test('classic cases', () => {
   expect(
     new OH(
       'Mo 11:00-13:00,18:00-22:00; Tu 11:00-13:00,18:00-22:00; Fr 11:00-13:00,18:00-22:00; Sa 11:00-13:00,18:00-22:00',
-    ).getFullStatusOfDay(new Date('2021-04-20 11:00')),
+    ).getFullStatusOfDay(new Date('2021-04-20 13:00')),
   ).toMatchObject({
     open: true,
     openUntil: '13:00',
@@ -51,7 +51,7 @@ test('classic cases', () => {
   });
   expect(
     new OH(
-      'Mo 11:00-13:00,18:00-22:00; Tu 11:00-13:00,18:00-02:00; Fr 11:00-13:00,18:00-22:00; Sa 11:00-13:00,18:00-22:00',
+      'Mo 11:00-13:00,18:00-22:00; Tu 11:00-13:00,17:00-02:00; Fr 11:00-13:00,18:00-22:00; Sa 11:00-13:00,18:00-22:00',
     ).getFullStatusOfDay(new Date('2021-04-20 19:00')),
   ).toMatchObject({
     open: true,

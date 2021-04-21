@@ -154,16 +154,19 @@ export class OpeningHours {
     return null;
   };
 
-  private openUntil = (formatHours: FormatHours[], date: Date): string => {
+  private openUntil = (formatHours: FormatHours[], date: Date) => {
     if (formatHours.length > 1) {
       const now = this.constructDateFromTime(`${date.getHours()}:${date.getMinutes()}`);
       for (let i = 1; i < formatHours.length; i = i + 2) {
         if (now < formatHours[i].date || now > formatHours[formatHours.length - 1].date) {
-          return formatHours[i].hour;
+          if (formatHours[i].date < formatHours[i - 1].date) {
+            return { formatHours: formatHours[i].hour, isTomorrow: true };
+          }
+          return { formatHours: formatHours[i].hour, isTomorrow: false };
         }
       }
     }
-    return `Aujourd'hui`;
+    return { formatHours: 'today', isTomorrow: false };
   };
 
   public checkOpeningTime = (date: Date) => {
@@ -184,11 +187,13 @@ export class OpeningHours {
         .map(hour => formatHours.push({ date: this.constructDateFromTime(hour), hour })),
     );
     if (isOpenNow) {
+      const open = this.openUntil(formatHours, date);
       return {
         open: true,
-        openUntil: this.openUntil(formatHours, date),
+        openUntil: open.formatHours,
         openAt: null,
         weekDay: null,
+        isTomorrow: open.isTomorrow,
       };
     }
     if (!isOpenNow) {
@@ -202,6 +207,7 @@ export class OpeningHours {
         openUntil: null,
         openAt: hour,
         weekDay: null,
+        isTomorrow: false,
       };
     }
   };
@@ -223,7 +229,8 @@ export class OpeningHours {
       open: false,
       openUntil: null,
       openAt: hour,
-      weekDay: nextDay.isTomorrow ? 'tomorrow' : this.formatWeekDay(nextDay.nextDay) ?? null,
+      weekDay: this.formatWeekDay(nextDay.nextDay) ?? null,
+      isTomorrow: nextDay.isTomorrow,
     };
   };
 

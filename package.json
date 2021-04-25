@@ -1,15 +1,15 @@
 {
   "name": "1-line-opening-hours",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Simple parser for OpenStreetMap `opening_hours`",
   "main": "lib/openingHours.js",
   "files": [
     "lib/**/*"
   ],
   "scripts": {
-    "test": "yon jest",
+    "test": "jest",
     "build": "tsc -p .",
-    "prepublish": "rm -rf ./lib && yon build"
+    "prepublish": "rm -rf ./lib && npm run build"
   },
   "repository": {
     "type": "git",
@@ -31,9 +31,9 @@
     "@types/jest": "^26.0.22",
     "@types/node": "^14.14.37",
     "jest": "^26.6.3",
+    "mockdate": "^3.0.5",
     "prettier": "^2.2.1",
     "ts-jest": "^26.5.4",
-    "typescript": "^3.3.4000",
-    "yarn-or-npm": "^3.0.1"
+    "typescript": "^3.3.4000"
   }
 }

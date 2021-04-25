@@ -17,7 +17,7 @@ export interface NextOpeningDay {
 }
 
 export interface NextReopening {
-  hour: string;
+  hour: string | null;
   day: string;
   opensInDay: number;
 }
@@ -62,6 +62,17 @@ export class OpeningHours {
     return this.openingHours;
   }
 
+  private getTodayDateWithOffset(utcOffset = 0): Date {
+    if (utcOffset === 0) {
+      return new Date();
+    }
+
+    const now = new Date();
+    now.setTime(now.getTime() + utcOffset * 60 * 1000);
+
+    return now;
+  }
+
   /**
    * Check whether the establishment is open on date based on the provided opening hour
    */
@@ -90,9 +101,12 @@ export class OpeningHours {
 
   /**
    * Check whether the establishment is open now based on the provided opening hour
+   *
+   * @param utcOffset give the establishment utcOffset in minutes, so it matches real now
+   * @returns true or false
    */
-  public isOpenNow(): boolean {
-    return this.isOpenOn(new Date());
+  public isOpenNow(utcOffset = 0): boolean {
+    return this.isOpenOn(this.getTodayDateWithOffset(utcOffset));
   }
 
   private geTimeSlots(time: string): [string, string] {
@@ -148,7 +162,7 @@ export class OpeningHours {
 
     if (!isOpenNow) {
       const hour = this.opensAt(formatHours, date, undefined);
-      if (hour === 'close') {
+      if (hour === null) {
         return {
           open: false,
           openUntil: null,
@@ -172,8 +186,13 @@ export class OpeningHours {
     };
   };
 
-  public getFullStatusOfToday = () => {
-    return this.getFullStatusOfDay(new Date());
+  /**
+   * Gave full information about today state.
+   * @param utcOffset give the establishment utcOffset in minutes, so it matches real now
+   * @returns FullDayStatus object
+   */
+  public getFullStatusOfToday = (utcOffset = 0): FullDayStatus => {
+    return this.getFullStatusOfDay(this.getTodayDateWithOffset(utcOffset));
   };
 
   /**
@@ -198,7 +217,7 @@ export class OpeningHours {
     formatHours: FormatHours[],
     date: Date,
     nextDay: string | undefined,
-  ): string => {
+  ): string | null => {
     if (formatHours.length > 1) {
       const now = this.constructDateFromTime(`${date.getUTCHours()}:${date.getUTCMinutes()}`);
       if (nextDay) {
@@ -210,7 +229,7 @@ export class OpeningHours {
         }
       }
     }
-    return 'close';
+    return null;
   };
 
   /**
@@ -218,7 +237,7 @@ export class OpeningHours {
    */
   private getNextOpeningDay(date: Date): NextOpeningDay {
     const today = date.getDay();
-    let times;
+    let times: string[] = [];
     let i = today;
 
     for (let key in this.openingHours) {
